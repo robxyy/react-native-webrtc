@@ -57,23 +57,24 @@ class GetUserMediaImpl {
         this.webRTCModule = webRTCModule;
         this.reactContext = reactContext;
 
-        boolean camera2supported = false;
-
-        try {
-            camera2supported = Camera2Enumerator.isSupported(reactContext);
-        } catch (Throwable tr) {
-            // Some devices will crash here with: Fatal Exception: java.lang.AssertionError: Supported FPS ranges cannot be null.
-            // Make sure we don't.
-            Log.w(TAG, "Error checking for Camera2 API support.", tr);
-        }
-
-        if (camera2supported) {
-            Log.d(TAG, "Creating video capturer using Camera2 API.");
-            cameraEnumerator = new Camera2Enumerator(reactContext);
-        } else {
-            Log.d(TAG, "Creating video capturer using Camera1 API.");
-            cameraEnumerator = new Camera1Enumerator(false);
-        }
+//        boolean camera2supported = false;
+//
+//        try {
+//            camera2supported = Camera2Enumerator.isSupported(reactContext);
+//        } catch (Throwable tr) {
+//            // Some devices will crash here with: Fatal Exception: java.lang.AssertionError: Supported FPS ranges cannot be null.
+//            // Make sure we don't.
+//            Log.w(TAG, "Error checking for Camera2 API support.", tr);
+//        }
+//
+//        if (camera2supported) {
+//            Log.d(TAG, "Creating video capturer using Camera2 API.");
+//            cameraEnumerator = new Camera2Enumerator(reactContext);
+//        } else {
+//            Log.d(TAG, "Creating video capturer using Camera1 API.");
+//            cameraEnumerator = new Camera1Enumerator(false);
+//        }
+        cameraEnumerator = new UvcCameraEnumerator(reactContext);
 
         reactContext.addActivityEventListener(new BaseActivityEventListener() {
             @Override
