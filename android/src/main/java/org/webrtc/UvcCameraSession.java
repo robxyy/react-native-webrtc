@@ -2,11 +2,13 @@ package org.webrtc;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.hardware.usb.UsbDevice;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Surface;
 import android.view.WindowManager;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.serenegiant.usb.USBMonitor;
 import com.serenegiant.usb.UVCCamera;
 import org.webrtc.CameraEnumerationAndroid.CaptureFormat;
@@ -19,6 +21,7 @@ public final class UvcCameraSession implements CameraSession {
     private final Events events;
     private final Context context;
     private final SurfaceTextureHelper surfaceTextureHelper;
+    private final LocalBroadcastManager localBroadcastManager;
 
     private final USBMonitor usbMonitor;
     private UsbDevice currentUsbDevice;
@@ -36,6 +39,7 @@ public final class UvcCameraSession implements CameraSession {
         this.cameraThreadHandler = new Handler();
         this.events = events;
         this.context = context;
+        this.localBroadcastManager = LocalBroadcastManager.getInstance(context);
         this.surfaceTextureHelper = surfaceTextureHelper;
         USBMonitor.OnDeviceConnectListener deviceConnectListener = new USBMonitor.OnDeviceConnectListener() {
             @Override
@@ -82,6 +86,9 @@ public final class UvcCameraSession implements CameraSession {
                         camera.setPreviewDisplay(uvcPreviewSurface);
                         camera.startPreview();
                         uvcCamera = camera;
+                        Intent intent = new Intent("org.jitsi.meet.VIDEO_MUTED_CHANGED_X");
+                        intent.putExtra("muted", false);
+                        localBroadcastManager.sendBroadcast(intent);
                     } catch (Exception e) {
                         e.printStackTrace();
                         // ignore
@@ -92,6 +99,9 @@ public final class UvcCameraSession implements CameraSession {
             @Override
             public void onDisconnect(UsbDevice usbDevice, USBMonitor.UsbControlBlock usbControlBlock) {
                 Log.i(TAG, "Usb device(" + usbDevice.getDeviceName() + "), onDisconnect");
+                Intent intent = new Intent("org.jitsi.meet.VIDEO_MUTED_CHANGED_X");
+                intent.putExtra("muted", true);
+                localBroadcastManager.sendBroadcast(intent);
             }
 
             @Override
